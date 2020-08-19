@@ -11,9 +11,11 @@ func main() {
 	app := app.New()
 	win := app.NewWindow("BCrypt Generator")
 	win.SetMaster()
+	ui.InitErrorMessage(win)
+	canvas := win.Canvas()
 
 	win.SetContent(widget.NewVBox(
-		ui.PasswordField(),
+		ui.PasswordField(canvas),
 	))
 	win.Resize(fyne.NewSize(640, 480))
 
