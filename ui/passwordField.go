@@ -28,8 +28,8 @@ func newDataDrivenEntry() *dataDrivenEntry {
 	return entry
 }
 
-// PasswordField creates a new password field ready to be used in the main UI
-func PasswordField(c fyne.Canvas) *fyne.Container {
+// NewPasswordField creates a new password field ready to be used in the main UI
+func NewPasswordField(c fyne.Canvas) *fyne.Container {
 	passSubject := data.NewStringSubject("")
 	modalCallback := func() {
 		showModal(c, passSubject)

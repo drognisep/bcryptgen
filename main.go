@@ -15,7 +15,7 @@ func main() {
 	canvas := win.Canvas()
 
 	win.SetContent(widget.NewVBox(
-		ui.PasswordField(canvas),
+		ui.NewPasswordField(canvas),
 	))
 	win.Resize(fyne.NewSize(640, 480))
 
