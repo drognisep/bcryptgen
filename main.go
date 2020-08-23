@@ -14,7 +14,6 @@ func main() {
 	win := app.NewWindow("BCrypt Generator")
 	win.SetMaster()
 	data.MainWindow = win
-	ui.InitErrorMessage(win)
 	copyPassBtn := widget.NewButton("Copy password", func() {
 		win.Clipboard().SetContent(data.Pass.GetState())
 	})
