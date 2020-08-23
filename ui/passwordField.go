@@ -13,6 +13,7 @@ import (
 
 var max = 64
 var min = 8
+var popup *widget.PopUp
 
 // NewPasswordField creates a new password field ready to be used in the main UI
 func NewPasswordField() *fyne.Container {
@@ -43,69 +44,74 @@ func strLengthOptions(min, max int) []string {
 }
 
 func showModal() {
-	var popup *widget.PopUp
-
-	passEntry := widget.NewEntry()
-	passEntry.OnChanged = func(newVal string) {
-		data.Pass.SetState(newVal)
-	}
-
-	passLengthSelect := widget.NewSelect(strLengthOptions(min, max), func(string) {})
-	passLengthSelect.SetSelected(string(min))
-	numDigitsSelect := widget.NewSelect(strLengthOptions(0, max), func(string) {})
-	numDigitsSelect.SetSelected(string(min / 3))
-	numSymbolsSelect := widget.NewSelect(strLengthOptions(0, max), func(string) {})
-	numSymbolsSelect.SetSelected(string(min / 3))
-	upperAlphaCheck := widget.NewCheck("Use mixed-case letters", func(b bool) {})
-	upperAlphaCheck.SetChecked(true)
-	allowRepeatsCheck := widget.NewCheck("Allow repeated characters", func(b bool) {})
-	allowRepeatsCheck.SetChecked(false)
-
-	gen := func() {
-		passLength, _ := strconv.Atoi(passLengthSelect.Selected)
-		numDigits, _ := strconv.Atoi(numDigitsSelect.Selected)
-		numSymbols, _ := strconv.Atoi(numSymbolsSelect.Selected)
-		s := generatePassword(
-			passLength,
-			numDigits,
-			numSymbols,
-			upperAlphaCheck.Checked,
-			allowRepeatsCheck.Checked,
-		)
-		passEntry.SetText(s)
-	}
-
-	content := fyne.NewContainerWithLayout(
-		layout.NewVBoxLayout(),
-		passEntry,
-		fyne.NewContainerWithLayout(
-			&FieldLineLayout{},
-			widget.NewLabel("Password Length"),
-			passLengthSelect,
-		),
-		fyne.NewContainerWithLayout(
-			&FieldLineLayout{},
-			widget.NewLabel("Number of digits"),
-			numDigitsSelect,
-		),
-		fyne.NewContainerWithLayout(
-			&FieldLineLayout{},
-			widget.NewLabel("Number of symbols"),
-			numSymbolsSelect,
-		),
-		upperAlphaCheck,
-		allowRepeatsCheck,
-		fyne.NewContainerWithLayout(
-			layout.NewHBoxLayout(),
-			widget.NewButton("Generate", gen),
-			widget.NewButton("Done", func() {
-				popup.Hide()
-			}),
-		),
-	)
-
-	popup = widget.NewModalPopUp(content, data.MainWindow.Canvas())
+	createGenPassModal()
 	popup.Show()
+}
+
+func createGenPassModal() {
+	if popup == nil {
+		passEntry := widget.NewEntry()
+		passEntry.OnChanged = func(newVal string) {
+			data.Pass.SetState(newVal)
+		}
+		passEntry.ReadOnly = true
+
+		passLengthSelect := widget.NewSelect(strLengthOptions(min, max), func(string) {})
+		passLengthSelect.SetSelected(string(min))
+		numDigitsSelect := widget.NewSelect(strLengthOptions(0, max), func(string) {})
+		numDigitsSelect.SetSelected(string(min / 3))
+		numSymbolsSelect := widget.NewSelect(strLengthOptions(0, max), func(string) {})
+		numSymbolsSelect.SetSelected(string(min / 3))
+		upperAlphaCheck := widget.NewCheck("Use mixed-case letters", func(b bool) {})
+		upperAlphaCheck.SetChecked(true)
+		allowRepeatsCheck := widget.NewCheck("Allow repeated characters", func(b bool) {})
+		allowRepeatsCheck.SetChecked(false)
+
+		gen := func() {
+			passLength, _ := strconv.Atoi(passLengthSelect.Selected)
+			numDigits, _ := strconv.Atoi(numDigitsSelect.Selected)
+			numSymbols, _ := strconv.Atoi(numSymbolsSelect.Selected)
+			s := generatePassword(
+				passLength,
+				numDigits,
+				numSymbols,
+				upperAlphaCheck.Checked,
+				allowRepeatsCheck.Checked,
+			)
+			passEntry.SetText(s)
+		}
+
+		content := fyne.NewContainerWithLayout(
+			layout.NewVBoxLayout(),
+			passEntry,
+			fyne.NewContainerWithLayout(
+				&FieldLineLayout{},
+				widget.NewLabel("Password Length"),
+				passLengthSelect,
+			),
+			fyne.NewContainerWithLayout(
+				&FieldLineLayout{},
+				widget.NewLabel("Number of digits"),
+				numDigitsSelect,
+			),
+			fyne.NewContainerWithLayout(
+				&FieldLineLayout{},
+				widget.NewLabel("Number of symbols"),
+				numSymbolsSelect,
+			),
+			upperAlphaCheck,
+			allowRepeatsCheck,
+			fyne.NewContainerWithLayout(
+				layout.NewHBoxLayout(),
+				widget.NewButton("Generate", gen),
+				widget.NewButton("Done", func() {
+					popup.Hide()
+				}),
+			),
+		)
+
+		popup = widget.NewModalPopUp(content, data.MainWindow.Canvas())
+	}
 }
 
 func generatePassword(length, numDigits, numSymbols int, useUpAlpha, allowRepeats bool) string {
