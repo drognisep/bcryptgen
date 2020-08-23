@@ -11,26 +11,8 @@ import (
 	"github.com/sethvargo/go-password/password"
 )
 
-const (
-	lowerLetters = "abcdefghijklmnopqrstuvwxyz"
-	upperLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	digits       = "0123456789"
-	symbols      = "~!@#$%^&*()_+`-={}|[]\\:\"<>?,./"
-)
-
 var max = 64
 var min = 8
-
-type dataDrivenEntry struct {
-	widget.Entry
-}
-
-func newDataDrivenEntry() *dataDrivenEntry {
-	entry := &dataDrivenEntry{}
-	entry.ExtendBaseWidget(entry)
-
-	return entry
-}
 
 // NewPasswordField creates a new password field ready to be used in the main UI
 func NewPasswordField() *fyne.Container {
@@ -74,7 +56,7 @@ func showModal() {
 	numDigitsSelect.SetSelected(string(min / 3))
 	numSymbolsSelect := widget.NewSelect(strLengthOptions(0, max), func(string) {})
 	numSymbolsSelect.SetSelected(string(min / 3))
-	upperAlphaCheck := widget.NewCheck("Use uppercase letters", func(b bool) {})
+	upperAlphaCheck := widget.NewCheck("Use mixed-case letters", func(b bool) {})
 	upperAlphaCheck.SetChecked(true)
 	allowRepeatsCheck := widget.NewCheck("Allow repeated characters", func(b bool) {})
 	allowRepeatsCheck.SetChecked(false)
