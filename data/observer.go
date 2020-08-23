@@ -22,6 +22,11 @@ func (s *StringSubject) SetState(newVal string) {
 	}
 }
 
+// SetStateNoBroadcast sets the subject state, but does not broadcast the change.
+func (s *StringSubject) SetStateNoBroadcast(newVal string) {
+	s.value = newVal
+}
+
 // GetState gets the current state of the subject.
 func (s *StringSubject) GetState() string {
 	return s.value

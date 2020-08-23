@@ -12,6 +12,9 @@ import (
 // NewBcryptField creates a new container with the content initialized.
 func NewBcryptField() *fyne.Container {
 	entry := widget.NewEntry()
+	entry.OnChanged = func(newHash string) {
+		data.Hash.SetStateNoBroadcast(newHash)
+	}
 	btn := widget.NewButton("Generate Hash", genBcrypt)
 	data.Hash.Attach(func(s string) {
 		entry.SetText(s)

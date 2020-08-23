@@ -18,10 +18,12 @@ var popup *widget.PopUp
 // NewPasswordField creates a new password field ready to be used in the main UI
 func NewPasswordField() *fyne.Container {
 	passEntry := widget.NewPasswordEntry()
-	obs := func(newPass string) {
-		passEntry.SetText(newPass)
+	passEntry.OnChanged = func(newPass string) {
+		data.Pass.SetStateNoBroadcast(newPass)
 	}
-	data.Pass.Attach(obs)
+	data.Pass.Attach(func(newPass string) {
+		passEntry.SetText(newPass)
+	})
 	field := fyne.NewContainerWithLayout(
 		layout.NewVBoxLayout(),
 		widget.NewLabel("Password"),
