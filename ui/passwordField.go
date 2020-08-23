@@ -1,13 +1,14 @@
 package ui
 
 import (
-	"crypto/rand"
-	"math/big"
+	"strconv"
 
 	"fyne.io/fyne"
+	"fyne.io/fyne/dialog"
 	"fyne.io/fyne/layout"
 	"fyne.io/fyne/widget"
 	"github.com/drognisep/bcryptgen/data"
+	"github.com/sethvargo/go-password/password"
 )
 
 const (
@@ -16,6 +17,9 @@ const (
 	digits       = "0123456789"
 	symbols      = "~!@#$%^&*()_+`-={}|[]\\:\"<>?,./"
 )
+
+var max = 64
+var min = 8
 
 type dataDrivenEntry struct {
 	widget.Entry
@@ -47,6 +51,15 @@ func NewPasswordField() *fyne.Container {
 	return field
 }
 
+func strLengthOptions(min, max int) []string {
+	olen := max - min + 1
+	opts := make([]string, olen)
+	for i := 0; i < olen; i++ {
+		opts[i] = strconv.Itoa(min + i)
+	}
+	return opts
+}
+
 func showModal() {
 	var popup *widget.PopUp
 
@@ -54,27 +67,52 @@ func showModal() {
 	passEntry.OnChanged = func(newVal string) {
 		data.Pass.SetState(newVal)
 	}
-	upperAlphaCheck := widget.NewCheck("Use uppercase alpha characters", func(b bool) {})
+
+	passLengthSelect := widget.NewSelect(strLengthOptions(min, max), func(string) {})
+	passLengthSelect.SetSelected(string(min))
+	numDigitsSelect := widget.NewSelect(strLengthOptions(0, max), func(string) {})
+	numDigitsSelect.SetSelected(string(min / 3))
+	numSymbolsSelect := widget.NewSelect(strLengthOptions(0, max), func(string) {})
+	numSymbolsSelect.SetSelected(string(min / 3))
+	upperAlphaCheck := widget.NewCheck("Use uppercase letters", func(b bool) {})
 	upperAlphaCheck.SetChecked(true)
-	lowerAlphaCheck := widget.NewCheck("Use lowercase alpha characters", func(b bool) {})
-	lowerAlphaCheck.SetChecked(true)
-	numCheck := widget.NewCheck("Use numeric characters", func(b bool) {})
-	numCheck.SetChecked(true)
-	specCheck := widget.NewCheck("Use special characters", func(b bool) {})
-	specCheck.SetChecked(true)
+	allowRepeatsCheck := widget.NewCheck("Allow repeated characters", func(b bool) {})
+	allowRepeatsCheck.SetChecked(false)
 
 	gen := func() {
-		s := generatePassword(10, upperAlphaCheck.Checked, lowerAlphaCheck.Checked, numCheck.Checked, specCheck.Checked)
+		passLength, _ := strconv.Atoi(passLengthSelect.Selected)
+		numDigits, _ := strconv.Atoi(numDigitsSelect.Selected)
+		numSymbols, _ := strconv.Atoi(numSymbolsSelect.Selected)
+		s := generatePassword(
+			passLength,
+			numDigits,
+			numSymbols,
+			upperAlphaCheck.Checked,
+			allowRepeatsCheck.Checked,
+		)
 		passEntry.SetText(s)
 	}
 
 	content := fyne.NewContainerWithLayout(
 		layout.NewVBoxLayout(),
 		passEntry,
+		fyne.NewContainerWithLayout(
+			&FieldLineLayout{},
+			widget.NewLabel("Password Length"),
+			passLengthSelect,
+		),
+		fyne.NewContainerWithLayout(
+			&FieldLineLayout{},
+			widget.NewLabel("Number of digits"),
+			numDigitsSelect,
+		),
+		fyne.NewContainerWithLayout(
+			&FieldLineLayout{},
+			widget.NewLabel("Number of symbols"),
+			numSymbolsSelect,
+		),
 		upperAlphaCheck,
-		lowerAlphaCheck,
-		numCheck,
-		specCheck,
+		allowRepeatsCheck,
 		fyne.NewContainerWithLayout(
 			layout.NewHBoxLayout(),
 			widget.NewButton("Generate", gen),
@@ -88,33 +126,11 @@ func showModal() {
 	popup.Show()
 }
 
-func generatePassword(length int, useUpAlpha bool, useLowAlpha bool, useNum bool, useSpecial bool) string {
-	buf := make([]rune, length)
-	var strings string
-
-	if useUpAlpha {
-		strings += upperLetters
+func generatePassword(length, numDigits, numSymbols int, useUpAlpha, allowRepeats bool) string {
+	pass, err := password.Generate(length, numDigits, numSymbols, !useUpAlpha, allowRepeats)
+	if err != nil {
+		dialog.ShowError(err, data.MainWindow)
+		return ""
 	}
-	if useLowAlpha {
-		strings += lowerLetters
-	}
-	if useNum {
-		strings += digits
-	}
-	if useSpecial {
-		strings += symbols
-	}
-	choices := []rune(strings)
-
-	max := len(choices)
-	for i := 0; i < length; i++ {
-		num, err := rand.Int(rand.Reader, big.NewInt(int64(max)))
-		if err != nil {
-			ShowErrorMessage("Failed to get random data for password")
-			return ""
-		}
-		buf[i] = choices[int(num.Int64())]
-	}
-
-	return string(buf)
+	return pass
 }
