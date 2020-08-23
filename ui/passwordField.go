@@ -56,12 +56,16 @@ func createGenPassModal() {
 		}
 		passEntry.ReadOnly = true
 
-		passLengthSelect := widget.NewSelect(strLengthOptions(min, max), func(string) {})
-		passLengthSelect.SetSelected(string(min))
 		numDigitsSelect := widget.NewSelect(strLengthOptions(0, max), func(string) {})
-		numDigitsSelect.SetSelected(string(min / 3))
+		numDigitsSelect.SetSelected(strconv.Itoa(min / 3))
 		numSymbolsSelect := widget.NewSelect(strLengthOptions(0, max), func(string) {})
-		numSymbolsSelect.SetSelected(string(min / 3))
+		numSymbolsSelect.SetSelected(strconv.Itoa(min / 3))
+		passLengthSelect := widget.NewSelect(strLengthOptions(min, max), func(newLen string) {
+			newLeni, _ := strconv.Atoi(newLen)
+			numDigitsSelect.SetSelected(strconv.Itoa(newLeni / 3))
+			numSymbolsSelect.SetSelected(strconv.Itoa(newLeni / 3))
+		})
+		passLengthSelect.SetSelected(strconv.Itoa(min))
 		upperAlphaCheck := widget.NewCheck("Use mixed-case letters", func(b bool) {})
 		upperAlphaCheck.SetChecked(true)
 		allowRepeatsCheck := widget.NewCheck("Allow repeated characters", func(b bool) {})
