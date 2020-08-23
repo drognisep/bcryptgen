@@ -29,35 +29,30 @@ func newDataDrivenEntry() *dataDrivenEntry {
 }
 
 // NewPasswordField creates a new password field ready to be used in the main UI
-func NewPasswordField(c fyne.Canvas) *fyne.Container {
-	passSubject := data.NewStringSubject("")
-	modalCallback := func() {
-		showModal(c, passSubject)
-	}
-
+func NewPasswordField() *fyne.Container {
 	passEntry := widget.NewPasswordEntry()
 	obs := func(newPass string) {
 		passEntry.SetText(newPass)
 	}
-	passSubject.Attach(obs)
+	data.Pass.Attach(obs)
 	field := fyne.NewContainerWithLayout(
 		layout.NewVBoxLayout(),
 		widget.NewLabel("Password"),
 		fyne.NewContainerWithLayout(
 			&FieldLineLayout{},
 			passEntry,
-			widget.NewButton("Generate Password", modalCallback),
+			widget.NewButton("Generate Password", showModal),
 		),
 	)
 	return field
 }
 
-func showModal(canvas fyne.Canvas, passSubject *data.StringSubject) {
+func showModal() {
 	var popup *widget.PopUp
 
 	passEntry := widget.NewEntry()
 	passEntry.OnChanged = func(newVal string) {
-		passSubject.SetState(newVal)
+		data.Pass.SetState(newVal)
 	}
 	upperAlphaCheck := widget.NewCheck("Use uppercase alpha characters", func(b bool) {})
 	upperAlphaCheck.SetChecked(true)
@@ -89,7 +84,7 @@ func showModal(canvas fyne.Canvas, passSubject *data.StringSubject) {
 		),
 	)
 
-	popup = widget.NewModalPopUp(content, canvas)
+	popup = widget.NewModalPopUp(content, data.MainWindow.Canvas())
 	popup.Show()
 }
 

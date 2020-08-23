@@ -4,6 +4,7 @@ import (
 	"fyne.io/fyne"
 	"fyne.io/fyne/app"
 	"fyne.io/fyne/widget"
+	"github.com/drognisep/bcryptgen/data"
 	"github.com/drognisep/bcryptgen/ui"
 )
 
@@ -11,13 +12,14 @@ func main() {
 	app := app.New()
 	win := app.NewWindow("BCrypt Generator")
 	win.SetMaster()
+	data.MainWindow = win
 	ui.InitErrorMessage(win)
-	canvas := win.Canvas()
 
 	win.SetContent(widget.NewVBox(
-		ui.NewPasswordField(canvas),
+		ui.NewPasswordField(),
+		ui.NewBcryptField(),
 	))
-	win.Resize(fyne.NewSize(640, 480))
+	win.Resize(fyne.NewSize(640, 300))
 
 	win.ShowAndRun()
 }
