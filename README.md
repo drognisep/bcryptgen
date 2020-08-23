@@ -1,4 +1,4 @@
-# Bcrypt Generator
+# BCrypt Generator
 This tool allows the user to generate passwords, generate Bcrypt hashes, and check user provided passwords and/or hashes.
 
 ## Installation
