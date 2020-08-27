@@ -1,6 +1,8 @@
 # BCrypt Generator
 This tool allows the user to generate passwords, generate Bcrypt hashes, and check user provided passwords and/or hashes.
 
+![Go](https://github.com/drognisep/bcryptgen/workflows/Go/badge.svg)
+
 ## Installation
 Download the latest release package for your operating system and place it somewhere accessible. The executable is self-contained, so there is no explicit install step needed.
 
