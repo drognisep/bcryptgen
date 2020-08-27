@@ -15,27 +15,6 @@ var max = 64
 var min = 8
 var popup *widget.PopUp
 
-// NewPasswordField creates a new password field ready to be used in the main UI
-func NewPasswordField() *fyne.Container {
-	passEntry := widget.NewPasswordEntry()
-	passEntry.OnChanged = func(newPass string) {
-		data.Pass.SetStateNoBroadcast(newPass)
-	}
-	data.Pass.Attach(func(newPass string) {
-		passEntry.SetText(newPass)
-	})
-	field := fyne.NewContainerWithLayout(
-		layout.NewVBoxLayout(),
-		widget.NewLabel("Password"),
-		fyne.NewContainerWithLayout(
-			&FieldLineLayout{},
-			passEntry,
-			widget.NewButton("Generate Password", showModal),
-		),
-	)
-	return field
-}
-
 func strLengthOptions(min, max int) []string {
 	olen := max - min + 1
 	opts := make([]string, olen)
@@ -45,13 +24,71 @@ func strLengthOptions(min, max int) []string {
 	return opts
 }
 
-func showModal() {
-	createGenPassModal()
-	popup.Show()
+type generatePasswordModal struct {
+	passEntry         *widget.Entry
+	numDigitsSelect   *widget.Select
+	numSymbolsSelect  *widget.Select
+	passLengthSelect  *widget.Select
+	upperAlphaCheck   *widget.Check
+	allowRepeatsCheck *widget.Check
+	popup             *widget.PopUp
+	genBtn            *widget.Button
+	doneBtn           *widget.Button
 }
 
-func createGenPassModal() {
-	if popup == nil {
+// PasswordComponent encapsulates the state needed to feed the view.
+type PasswordComponent struct {
+	passEntry      *widget.Entry
+	generateButton *widget.Button
+	modal          *generatePasswordModal
+	content        fyne.CanvasObject
+}
+
+// Content returns rendered content for this component.
+func (p *PasswordComponent) Content() fyne.CanvasObject {
+	if p.content == nil {
+		p.content = fyne.NewContainerWithLayout(
+			layout.NewVBoxLayout(),
+			widget.NewLabel("Password"),
+			fyne.NewContainerWithLayout(
+				&FieldLineLayout{},
+				p.passEntry,
+				p.generateButton,
+			),
+		)
+	} else {
+		p.content.Refresh()
+	}
+	return p.content
+}
+
+// NewPasswordField creates a new password field ready to be used in the main UI
+func NewPasswordField() *PasswordComponent {
+	generateButton := widget.NewButton("Generate Password", func() {})
+	passEntry := widget.NewPasswordEntry()
+	passEntry.OnChanged = func(newPass string) {
+		data.Pass.SetStateNoBroadcast(newPass)
+	}
+	data.Pass.Attach(func(newPass string) {
+		passEntry.SetText(newPass)
+	})
+
+	component := &PasswordComponent{
+		passEntry:      passEntry,
+		generateButton: generateButton,
+		modal:          nil,
+	}
+	generateButton.OnTapped = component.showModal
+	return component
+}
+
+func (p *PasswordComponent) showModal() {
+	p.createGenPassModal()
+	p.modal.popup.Show()
+}
+
+func (p *PasswordComponent) createGenPassModal() {
+	if p.modal == nil {
 		passEntry := widget.NewEntry()
 		passEntry.OnChanged = func(newVal string) {
 			data.Pass.SetState(newVal)
@@ -87,6 +124,12 @@ func createGenPassModal() {
 			passEntry.SetText(s)
 		}
 
+		genBtn := widget.NewButton("Generate", gen)
+		doneBtn := widget.NewButton("Done", func() {
+			p.modal.popup.Hide()
+		})
+
+		var popup *widget.PopUp
 		content := fyne.NewContainerWithLayout(
 			layout.NewVBoxLayout(),
 			passEntry,
@@ -109,14 +152,25 @@ func createGenPassModal() {
 			allowRepeatsCheck,
 			fyne.NewContainerWithLayout(
 				layout.NewHBoxLayout(),
-				widget.NewButton("Generate", gen),
-				widget.NewButton("Done", func() {
-					popup.Hide()
-				}),
+				genBtn,
+				doneBtn,
 			),
 		)
-
 		popup = widget.NewModalPopUp(content, data.MainWindow.Canvas())
+
+		modal := &generatePasswordModal{
+			passEntry:         passEntry,
+			numDigitsSelect:   numDigitsSelect,
+			numSymbolsSelect:  numSymbolsSelect,
+			passLengthSelect:  passLengthSelect,
+			upperAlphaCheck:   upperAlphaCheck,
+			allowRepeatsCheck: allowRepeatsCheck,
+			popup:             popup,
+			genBtn:            genBtn,
+			doneBtn:           doneBtn,
+		}
+
+		p.modal = modal
 	}
 }
 

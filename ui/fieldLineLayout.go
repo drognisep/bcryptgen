@@ -14,6 +14,7 @@ func intMax(a, b int) int {
 	return b
 }
 
+// MinSize implements the same method from fyne.Layout
 func (l *FieldLineLayout) MinSize(objects []fyne.CanvasObject) fyne.Size {
 	w, h := 0, 0
 	for _, o := range objects {
@@ -24,6 +25,7 @@ func (l *FieldLineLayout) MinSize(objects []fyne.CanvasObject) fyne.Size {
 	return fyne.NewSize(w, h)
 }
 
+// Layout implements the same method from fyne.Layout
 func (l *FieldLineLayout) Layout(objects []fyne.CanvasObject, containerSize fyne.Size) {
 	elemHeight := l.MinSize(objects).Height
 	otherWidth := 0

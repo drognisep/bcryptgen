@@ -15,6 +15,11 @@ import (
 
 func main() {
 	app := app.New()
+	app.SetIcon(ui.ResourceIconPng)
+	newBcryptGen(app)
+}
+
+func newBcryptGen(app fyne.App) {
 	win := app.NewWindow("BCrypt Generator")
 	win.SetMaster()
 	data.MainWindow = win
@@ -39,8 +44,10 @@ func main() {
 		}
 	})
 
+	passComponent := ui.NewPasswordField()
+
 	win.SetContent(widget.NewVBox(
-		ui.NewPasswordField(),
+		passComponent.Content(),
 		ui.NewBcryptField(),
 		fyne.NewContainerWithLayout(
 			layout.NewHBoxLayout(),
