@@ -9,8 +9,33 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// BcryptComponent encapsulates the state and content of the BCrypt controls.
+type BcryptComponent struct {
+	entry          *widget.Entry
+	generateButton *widget.Button
+	content        fyne.CanvasObject
+}
+
+// Content returns the content for this component.
+func (b *BcryptComponent) Content() fyne.CanvasObject {
+	if b.content == nil {
+		b.content = fyne.NewContainerWithLayout(
+			layout.NewVBoxLayout(),
+			widget.NewLabel("Bcrypt Hash"),
+			fyne.NewContainerWithLayout(
+				&FieldLineLayout{},
+				b.entry,
+				b.generateButton,
+			),
+		)
+	} else {
+		b.content.Refresh()
+	}
+	return b.content
+}
+
 // NewBcryptField creates a new container with the content initialized.
-func NewBcryptField() *fyne.Container {
+func NewBcryptField() *BcryptComponent {
 	entry := widget.NewEntry()
 	entry.OnChanged = func(newHash string) {
 		data.Hash.SetStateNoBroadcast(newHash)
@@ -23,17 +48,7 @@ func NewBcryptField() *fyne.Container {
 		entry.SetText("")
 	})
 
-	content := fyne.NewContainerWithLayout(
-		layout.NewVBoxLayout(),
-		widget.NewLabel("Bcrypt Hash"),
-		fyne.NewContainerWithLayout(
-			&FieldLineLayout{},
-			entry,
-			btn,
-		),
-	)
-
-	return content
+	return &BcryptComponent{entry: entry, generateButton: btn}
 }
 
 func genBcrypt() {

@@ -45,10 +45,11 @@ func newBcryptGen(app fyne.App) {
 	})
 
 	passComponent := ui.NewPasswordField()
+	bcryptComponent := ui.NewBcryptField()
 
 	win.SetContent(widget.NewVBox(
 		passComponent.Content(),
-		ui.NewBcryptField(),
+		bcryptComponent.Content(),
 		fyne.NewContainerWithLayout(
 			layout.NewHBoxLayout(),
 			copyPassBtn,
