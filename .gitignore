@@ -1,3 +1,5 @@
 *.exe
 *.syso
 .vscode
+*.tar.gz
+*.zip
