@@ -5,13 +5,14 @@ import (
 
 	"fyne.io/fyne/test"
 	"github.com/drognisep/bcryptgen/data"
+	testify "github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func TestBcryptGeneration(t *testing.T) {
 	app := test.NewApp()
 	win := app.NewWindow("testing")
-	bcryptGen := NewBcryptField()
+	bcryptGen := NewBcryptField(win)
 	win.SetContent(bcryptGen.Content())
 	data.MainWindow = win
 
@@ -22,6 +23,20 @@ func TestBcryptGeneration(t *testing.T) {
 	if err != nil {
 		t.Errorf("Pass and hash do not match: %v", err)
 	}
+}
+
+func TestNoPasswordNoHash(t *testing.T) {
+	assert := testify.New(t)
+	app := test.NewApp()
+	win := app.NewWindow("testing")
+	bcryptGen := NewBcryptField(win)
+	win.SetContent(bcryptGen.Content())
+	data.MainWindow = win
+
+	data.Pass.SetState("")
+	test.Tap(bcryptGen.generateButton)
+
+	assert.Equal("", data.Hash.GetState(), "Hash should not be generated with empty password")
 }
 
 func comparePassAndHash(t *testing.T) error {
