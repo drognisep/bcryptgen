@@ -2,11 +2,14 @@ package main
 
 import (
 	"errors"
+	"time"
 
 	"fyne.io/fyne"
 	"fyne.io/fyne/app"
+	"fyne.io/fyne/container"
 	"fyne.io/fyne/dialog"
 	"fyne.io/fyne/layout"
+	"fyne.io/fyne/theme"
 	"fyne.io/fyne/widget"
 	"github.com/drognisep/bcryptgen/data"
 	"github.com/drognisep/bcryptgen/ui"
@@ -14,21 +17,33 @@ import (
 )
 
 func main() {
-	app := app.New()
-	app.SetIcon(ui.ResourceIconPng)
-	newBcryptGen(app)
+	myApp := app.New()
+	myApp.SetIcon(ui.ResourceIconPng)
+	newBcryptGen(myApp)
 }
 
 func newBcryptGen(app fyne.App) {
 	win := app.NewWindow("BCrypt Generator")
 	win.SetMaster()
 	data.MainWindow = win
-	copyPassBtn := widget.NewButton("Copy password", func() {
+	copyPassBtn := widget.NewButton("Copy password", func() {})
+	copyPass := func() {
 		win.Clipboard().SetContent(data.Pass.GetState())
-	})
-	copyHashBtn := widget.NewButton("Copy hash", func() {
+		copyPassBtn.SetIcon(theme.ConfirmIcon())
+		time.AfterFunc(time.Second, func() {
+			copyPassBtn.SetIcon(nil)
+		})
+	}
+	copyPassBtn.OnTapped = copyPass
+	copyHashBtn := widget.NewButton("Copy hash", func() {})
+	copyHash := func() {
 		win.Clipboard().SetContent(data.Hash.GetState())
-	})
+		copyHashBtn.SetIcon(theme.ConfirmIcon())
+		time.AfterFunc(time.Second, func() {
+			copyHashBtn.SetIcon(nil)
+		})
+	}
+	copyHashBtn.OnTapped = copyHash
 	compareHashBtn := widget.NewButton("Compare password and hash", func() {
 		pass := data.Pass.GetState()
 		hash := data.Hash.GetState()
@@ -45,11 +60,12 @@ func newBcryptGen(app fyne.App) {
 	})
 
 	passComponent := ui.NewPasswordField()
-	bcryptComponent := ui.NewBcryptField()
+	bcryptComponent := ui.NewBcryptField(win)
 
-	win.SetContent(widget.NewVBox(
+	win.SetContent(container.NewVBox(
 		passComponent.Content(),
 		bcryptComponent.Content(),
+		layout.NewSpacer(),
 		fyne.NewContainerWithLayout(
 			layout.NewHBoxLayout(),
 			copyPassBtn,

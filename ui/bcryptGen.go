@@ -35,12 +35,18 @@ func (b *BcryptComponent) Content() fyne.CanvasObject {
 }
 
 // NewBcryptField creates a new container with the content initialized.
-func NewBcryptField() *BcryptComponent {
+func NewBcryptField(win fyne.Window) *BcryptComponent {
 	entry := widget.NewEntry()
 	entry.OnChanged = func(newHash string) {
 		data.Hash.SetStateNoBroadcast(newHash)
 	}
-	btn := widget.NewButton("Generate Hash", genBcrypt)
+	btn := widget.NewButton("Generate Hash", func() {
+		if data.Pass.GetState() == "" {
+			dialog.ShowInformation("No Password Set", "Set a password before generating a hash", win)
+			return
+		}
+		genBcrypt()
+	})
 	data.Hash.Attach(func(s string) {
 		entry.SetText(s)
 	})
