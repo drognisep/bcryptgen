@@ -30,10 +30,8 @@ func newBcryptGen(app fyne.App) {
 	copyPass := func() {
 		win.Clipboard().SetContent(data.Pass.GetState())
 		copyPassBtn.SetIcon(theme.ConfirmIcon())
-		copyPassBtn.SetText("")
 		time.AfterFunc(time.Second, func() {
 			copyPassBtn.SetIcon(nil)
-			copyPassBtn.SetText("Copy password")
 		})
 	}
 	copyPassBtn.OnTapped = copyPass
@@ -41,10 +39,8 @@ func newBcryptGen(app fyne.App) {
 	copyHash := func() {
 		win.Clipboard().SetContent(data.Hash.GetState())
 		copyHashBtn.SetIcon(theme.ConfirmIcon())
-		copyHashBtn.SetText("")
 		time.AfterFunc(time.Second, func() {
 			copyHashBtn.SetIcon(nil)
-			copyHashBtn.SetText("Copy hash")
 		})
 	}
 	copyHashBtn.OnTapped = copyHash
@@ -64,7 +60,7 @@ func newBcryptGen(app fyne.App) {
 	})
 
 	passComponent := ui.NewPasswordField()
-	bcryptComponent := ui.NewBcryptField()
+	bcryptComponent := ui.NewBcryptField(win)
 
 	win.SetContent(container.NewVBox(
 		passComponent.Content(),
