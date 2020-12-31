@@ -3,7 +3,8 @@ module github.com/drognisep/bcryptgen
 go 1.14
 
 require (
-	fyne.io/fyne v1.3.3
+	fyne.io/fyne v1.4.2
 	github.com/sethvargo/go-password v0.2.0
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	github.com/stretchr/testify v1.6.1 // indirect
+	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
 )

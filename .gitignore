@@ -1,5 +1,3 @@
-*.exe
-*.syso
 .vscode
-*.tar.gz
-*.zip
+.idea
+fyne-cross
